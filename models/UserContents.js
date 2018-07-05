@@ -1,0 +1,86 @@
+/* jshint indent: 1 */
+
+module.exports = function(sequelize, DataTypes) {
+	return sequelize.define('UserContents', {
+		UserContentId: {
+			type: DataTypes.INTEGER,
+			allowNull: false,
+			primaryKey: true,
+			autoIncrement: true
+		},
+		SentenceCount: {
+			type: DataTypes.INTEGER,
+			allowNull: false
+		},
+		UnusualWordCount: {
+			type: DataTypes.INTEGER,
+			allowNull: false
+		},
+		QuestionsCount: {
+			type: DataTypes.INTEGER,
+			allowNull: false
+		},
+		ExclamationPointCount: {
+			type: DataTypes.INTEGER,
+			allowNull: false
+		},
+		LongestSentenceWordCount: {
+			type: DataTypes.INTEGER,
+			allowNull: false
+		},
+		Classification: {
+			type: DataTypes.INTEGER,
+			allowNull: false
+		},
+		ContentId: {
+			type: DataTypes.INTEGER,
+			allowNull: false
+		},
+		UserId: {
+			type: DataTypes.INTEGER,
+			allowNull: false,
+			references: {
+				model: 'Users',
+				key: 'UserId'
+			}
+		},
+		CompanyId: {
+			type: DataTypes.INTEGER,
+			allowNull: false,
+			references: {
+				model: 'Companies',
+				key: 'CompanyId'
+			}
+		},
+		RecipientId: {
+			type: DataTypes.INTEGER,
+			allowNull: false
+		},
+		AuthoredDate: {
+			type: DataTypes.DATEONLY,
+			allowNull: false
+		},
+		ContentsText: {
+			type: DataTypes.STRING,
+			allowNull: true
+		},
+		ParentContentId: {
+			type: DataTypes.INTEGER,
+			allowNull: false
+		},
+		Score: {
+			type: DataTypes.INTEGER,
+			allowNull: false
+		},
+		CharacterCount: {
+			type: DataTypes.INTEGER,
+			allowNull: false
+		},
+		WordCount: {
+			type: DataTypes.INTEGER,
+			allowNull: false
+		}
+	}, {
+		tableName: 'UserContents'
+	});
+};

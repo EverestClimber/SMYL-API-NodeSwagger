@@ -1,0 +1,375 @@
+---
+swagger: "2.0"
+info:
+  description: "This is our SMYL API"
+  version: "1.0.0"
+  title: "Joanna API"
+  termsOfService: "https://smylglobal.com/terms/"
+  contact:
+    email: "joey.miller@me.com"
+  license:
+    name: "SMYL License 1.0"
+    url: "https://smylglobal.com/licenses/LICENSE-1.0.html"
+host: "devsmyl.azurewebsites.net"
+basePath: "/"
+tags:
+- name: "user"
+  description: "Operations about user"
+- name: "lists"
+  description: "lookup lists and their information"
+- name: "suggestions"
+  description: "retrieve suggestions based on content"
+schemes:
+- "http"
+- "https"
+paths:
+  /user:
+    post:
+      tags:
+      - "user"
+      summary: "Create user"
+      description: "This can only be done by the logged in user."
+      operationId: "createUser"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "user"
+        description: "Created user object"
+        required: true
+        schema:
+          $ref: "#/definitions/User"
+      responses:
+        200:
+          description: "success"
+          schema:
+            $ref: "#/definitions/User"
+        default:
+          description: "failed"
+          schema:
+            $ref: "#/definitions/Response_API"
+      security:
+      - Bearer: []
+      x-swagger-router-controller: "User"
+  /user/login:
+    post:
+      tags:
+      - "user"
+      summary: "Logs user into the system"
+      operationId: "loginUser"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "user"
+        description: "login using email and password"
+        required: true
+        schema:
+          $ref: "#/definitions/Request_LoginUser"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/inline_response_200"
+          headers:
+            X-Rate-Limit:
+              type: "integer"
+              description: "calls per hour allowed by the user"
+            X-Expires-After:
+              type: "string"
+              description: "date in UTC when token expires"
+        default:
+          description: "Invalid email/password supplied"
+          schema:
+            $ref: "#/definitions/Response_API"
+      x-swagger-router-controller: "User"
+  /user/logout:
+    get:
+      tags:
+      - "user"
+      summary: "Logs out current logged in user session"
+      operationId: "logoutUser"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Response_API"
+        default:
+          description: "failed operation"
+          schema:
+            $ref: "#/definitions/Response_API"
+      x-swagger-router-controller: "User"
+  /user/{id}:
+    get:
+      tags:
+      - "user"
+      summary: "Get a user by ID"
+      operationId: "getUserById"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "The ID of the user that needs to be fetched."
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/User"
+        400:
+          description: "failed operation"
+          schema:
+            $ref: "#/definitions/Response_API"
+      security:
+      - Bearer: []
+      x-swagger-router-controller: "User"
+    put:
+      tags:
+      - "user"
+      summary: "Update a user"
+      description: "This can only be done by the logged in user."
+      operationId: "updateUser"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "User that need to be updated"
+        required: true
+        type: "integer"
+      - in: "body"
+        name: "user"
+        description: "Updated user object"
+        required: true
+        schema:
+          $ref: "#/definitions/User"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/User"
+        default:
+          description: "failed operation"
+          schema:
+            $ref: "#/definitions/Response_API"
+      security:
+      - Bearer: []
+      x-swagger-router-controller: "User"
+    delete:
+      tags:
+      - "user"
+      summary: "Delete a user"
+      description: "This can only be done by the logged in user."
+      operationId: "deleteUser"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "The user that needs to be deleted"
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/User"
+        default:
+          description: "failed operation"
+          schema:
+            $ref: "#/definitions/Response_API"
+      security:
+      - Bearer: []
+      x-swagger-router-controller: "User"
+  /user/getUserbyEmail/{email}:
+    get:
+      tags:
+      - "user"
+      summary: "Get a user by email"
+      operationId: "getUserByEmail"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "email"
+        in: "path"
+        description: "The email of the user that needs to be fetched."
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/User"
+        default:
+          description: "failed operation"
+          schema:
+            $ref: "#/definitions/Response_API"
+      security:
+      - Bearer: []
+      x-swagger-router-controller: "User"
+  /lists/groupEmails:
+    get:
+      tags:
+      - "lists"
+      summary: "Get defined group email addresses list"
+      operationId: "getGroupEmails"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/groupEmails"
+        default:
+          description: "failed operation"
+          schema:
+            $ref: "#/definitions/Response_API"
+      security:
+      - Bearer: []
+      x-swagger-router-controller: "Lists"
+  /suggestions/{id}:
+    get:
+      tags:
+      - "suggestions"
+      summary: "Get suggestions"
+      operationId: "getSuggestions"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "suggestion id"
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Suggestion"
+        default:
+          description: "failed operation"
+          schema:
+            $ref: "#/definitions/Response_API"
+      security:
+      - Bearer: []
+      x-swagger-router-controller: "Suggestions"
+securityDefinitions:
+  Bearer:
+    description: "Bearer web token - Bearer"
+    type: "apiKey"
+    name: "Authorization"
+    in: "header"
+definitions:
+  User:
+    type: "object"
+    properties:
+      userId:
+        type: "integer"
+      primaryEmail:
+        type: "string"
+      secondaryEmail:
+        type: "string"
+      title:
+        type: "integer"
+      firstName:
+        type: "string"
+      lastName:
+        type: "string"
+      language:
+        type: "integer"
+      languageProficiency:
+        type: "integer"
+      companyId:
+        type: "integer"
+      lastLoggedIn:
+        type: "string"
+      optInData:
+        type: "integer"
+      communicatorId:
+        type: "integer"
+      belbinPreferred:
+        type: "integer"
+      mbti:
+        type: "integer"
+      gender:
+        type: "integer"
+      dateOfBirth:
+        type: "string"
+    example:
+      optInData: 2
+      lastName: "lastName"
+      communicatorId: 7
+      secondaryEmail: "secondaryEmail"
+      languageProficiency: 5
+      gender: 51
+      language: 1
+      dateOfBirth: "2000-01-23T04:56:07.000+00:00"
+      title: 6
+      userId: 0
+      firstName: "firstName"
+      companyId: 5
+      belbinPreferred: 9
+      lastLoggedIn: "2000-01-23T04:56:07.000+00:00"
+      mbti: 3
+      primaryEmail: "primaryEmail"
+  Response_API:
+    type: "object"
+    properties:
+      code:
+        type: "integer"
+      type:
+        type: "string"
+      message:
+        type: "string"
+    example:
+      code: 0
+      type: "type"
+      message: "message"
+  Request_LoginUser:
+    type: "object"
+    required:
+    - "email"
+    - "password"
+    properties:
+      email:
+        type: "string"
+      password:
+        type: "string"
+    example:
+      password: "password"
+      email: "email"
+  groupEmails:
+    type: "array"
+    items:
+      type: "string"
+  Suggestion:
+    type: "object"
+    properties:
+      userSuggestionId:
+        type: "integer"
+      suggestionId:
+        type: "integer"
+      userId:
+        type: "integer"
+      replacementText:
+        type: "string"
+    example:
+      replacementText: "replacementText"
+      userSuggestionId: 0
+      suggestionId: 6
+      userId: 1
+  inline_response_200:
+    properties:
+      token:
+        type: "string"
+    example:
+      token: "token"
+externalDocs:
+  description: "Find out more about SMYL"
+  url: "https://smylglobal.com"

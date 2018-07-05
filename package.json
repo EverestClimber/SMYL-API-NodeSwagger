@@ -1,0 +1,26 @@
+{
+  "name": "joanna-api",
+  "version": "1.0.0",
+  "description": "This is our SMYL API",
+  "main": "index.js",
+  "scripts": {
+    "prestart": "npm install",
+    "start": "node index.js"
+  },
+  "keywords": [
+    "swagger"
+  ],
+  "license": "Apache-2.0",
+  "private": true,
+  "dependencies": {
+    "async": "^2.6.1",
+    "connect": "^3.2.0",
+    "cors": "^2.8.4",
+    "js-yaml": "^3.3.0",
+    "jsonwebtoken": "^8.3.0",
+    "sequelize": "^4.38.0",
+    "sql": "^0.78.0",
+    "swagger-tools": "0.10.1",
+    "tedious": "^2.6.1"
+  }
+}

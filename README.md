@@ -1,1 +1,1 @@
-See Wiki for more info: https://github.com/inkscroll/smyl-api/wiki
+See https://smylglobal.atlassian.net/wiki/spaces/EN/overview for more info

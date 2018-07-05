@@ -1,0 +1,82 @@
+/* jshint indent: 1 */
+
+module.exports = function(sequelize, DataTypes) {
+	return sequelize.define('Users', {
+		UserId: {
+			type: DataTypes.INTEGER,
+			allowNull: false,
+			primaryKey: true
+		},
+		PrimaryEmail: {
+			type: DataTypes.STRING,
+			allowNull: false
+		},
+		SecondaryEmail: {
+			type: DataTypes.STRING,
+			allowNull: false
+		},
+		Title: {
+			type: DataTypes.INTEGER,
+			allowNull: false
+		},
+		FirstName: {
+			type: DataTypes.STRING,
+			allowNull: false
+		},
+		LastName: {
+			type: DataTypes.STRING,
+			allowNull: false
+		},
+		Language: {
+			type: DataTypes.INTEGER,
+			allowNull: false
+		},
+		LanguageProficency: {
+			type: DataTypes.INTEGER,
+			allowNull: false
+		},
+		CompanyId: {
+			type: DataTypes.INTEGER,
+			allowNull: false,
+			references: {
+				model: 'Companies',
+				key: 'CompanyId'
+			}
+		},
+		LastLoggedIn: {
+			type: DataTypes.DATE,
+			allowNull: false,
+		},
+		OptInData: {
+			type: DataTypes.BOOLEAN,
+			allowNull: false
+		},
+		CommunicatorId: {
+			type: DataTypes.INTEGER,
+			allowNull: false,
+			references: {
+				model: 'LookupCommunicators',
+				key: 'CommunicatorId'
+			}
+		},
+		BelbinPreferred: {
+			type: DataTypes.INTEGER,
+			allowNull: false
+		},
+		Mbti: {
+			type: DataTypes.INTEGER,
+			allowNull: false
+		},
+		Gender: {
+			type: DataTypes.INTEGER,
+			allowNull: false
+		},
+		DateOfBirth: {
+			type: DataTypes.DATE,
+			allowNull: false,
+		}
+	}, {
+		tableName: 'Users',
+		timestamps: false,
+	});
+};
