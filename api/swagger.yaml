@@ -204,7 +204,7 @@ paths:
         200:
           description: "successful operation"
           schema:
-            $ref: "#/definitions/User"
+            $ref: "#/definitions/User_getUserbyEmail"
         default:
           description: "failed operation"
           schema:
@@ -318,6 +318,64 @@ definitions:
       lastLoggedIn: "2000-01-23T04:56:07.000+00:00"
       mbti: 3
       primaryEmail: "primaryEmail"
+  User_getUserbyEmail:
+    type: "object"
+    properties:
+      userId:
+        type: "integer"
+      primaryEmail:
+        type: "string"
+      secondaryEmail:
+        type: "string"
+      title:
+        type: "integer"
+      firstName:
+        type: "string"
+      lastName:
+        type: "string"
+      language:
+        type: "integer"
+      languageProficiency:
+        type: "integer"
+      companyId:
+        type: "integer"
+      lastLoggedIn:
+        type: "string"
+      optInData:
+        type: "integer"
+      communicatorId:
+        type: "integer"
+      belbinPreferred:
+        type: "integer"
+      mbti:
+        type: "integer"
+      gender:
+        type: "integer"
+      dateOfBirth:
+        type: "string"
+      communicatorName:
+        type: "string"
+      summary:
+        type: "string"
+    example:
+      optInData: 2
+      lastName: "lastName"
+      communicatorId: 7
+      secondaryEmail: "secondaryEmail"
+      languageProficiency: 5
+      gender: 51
+      language: 1
+      dateOfBirth: "2000-01-23T04:56:07.000+00:00"
+      title: 6
+      userId: 0
+      firstName: "firstName"
+      companyId: 5
+      belbinPreferred: 9
+      lastLoggedIn: "2000-01-23T04:56:07.000+00:00"
+      mbti: 3
+      primaryEmail: "primaryEmail"
+      communicatorName: "communicatorName"
+      summary: "summary"
   Response_API:
     type: "object"
     properties:
