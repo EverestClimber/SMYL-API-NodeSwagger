@@ -16,6 +16,7 @@ module.exports = function(sequelize, DataTypes) {
 			allowNull: false
 		}
 	}, {
-		tableName: 'LookupCommunicators'
+		tableName: 'LookupCommunicators',
+		timestamps: false,
 	});
 };

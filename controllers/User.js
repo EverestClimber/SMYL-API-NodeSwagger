@@ -1,9 +1,9 @@
 'use strict';
 
 var utils = require('../utils/writer.js');
-var sequelizer = require('../utils/dbconfig').sequelizer;
-var Sequelize = require('../utils/dbconfig').Sequelize;
-var Users = require('../models/Users')(sequelizer, Sequelize);
+var Sequelize = require('sequelize');
+var Users = require('../models').Users;
+var LookupCommunicators = require('../models').LookupCommunicators;
 var auth = require("../utils/auth");
 const Op = Sequelize.Op;
 module.exports.createUser = function createUser (req, res, next) {
@@ -40,6 +40,18 @@ module.exports.deleteUser = function deleteUser (req, res, next) {
   })
 };
 
+const getCommunicatorDetailsById = (id) => {
+  console.log("getCommunicatorDetailsById")
+  return new Promise((resolve, reject) => {
+    LookupCommunicators.findOne({
+      where: {
+        CommunicatorId: id
+      },
+    })
+    .then(result => {console.log(result);result == null ? reject() : resolve(result)})
+  });
+}
+
 module.exports.getUserByEmail = function getUserByEmail (req, res, next) {
   var email = req.swagger.params['email'].value;
   new Promise(function(resolve, reject) {
@@ -51,7 +63,16 @@ module.exports.getUserByEmail = function getUserByEmail (req, res, next) {
     .then(result => result == null ? reject() : resolve(result))
   })
   .then(response => {
-    utils.writeJson(res, response);
+    getCommunicatorDetailsById(response["dataValues"]["CommunicatorId"])
+    .then(response1 => {
+      response["dataValues"]['CommunicatorName'] = response1.CommunicatorName;
+      response["dataValues"]['Summary'] = response1.Summary;
+      utils.writeJson(res, response);
+    })
+    .catch(() => {
+      utils.writeJson(res, response);
+    })
+    
   })
   .catch(() => {
     utils.writeJson(res, utils.respondWithCode(400, {error: 400, type: "error", message: "not found"}))
