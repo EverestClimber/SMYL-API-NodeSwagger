@@ -212,6 +212,36 @@ paths:
       security:
       - Bearer: []
       x-swagger-router-controller: "User"
+  /user/contents/{id}:
+    put:
+      tags:
+      - "user"
+      summary: "Get a usercontent by id"
+      operationId: "getContentById"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        type: "integer"
+      - in: "body"
+        name: "content"
+        required: true
+        schema:
+          $ref: "#/definitions/Request_getContentById"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Response_getContentById"
+        default:
+          description: "failed operation"
+          schema:
+            $ref: "#/definitions/Response_API"
+      security:
+      - Bearer: []
+      x-swagger-router-controller: "User"
   /lists/groupEmails:
     get:
       tags:
@@ -428,6 +458,30 @@ definitions:
         type: "string"
     example:
       token: "token"
+  Request_getContentById:
+    type: "object"
+    required:
+    - "recipientEmail"
+    - "contentsText"
+    - "authoredDate"
+    properties:
+      recipientEmail:
+        type: "string"
+      contentsText:
+        type: "string"
+      authoredDate:
+        type: "string"
+    example:
+      recipientEmail: "example@gmail.com"
+      contentsText: "example content"
+      authoredDate: ""
+  Response_getContentById:
+    type: "object"
+    required: 
+    - "score"
+    properties:
+      score:
+        type: "integer"
 externalDocs:
   description: "Find out more about SMYL"
   url: "https://smylglobal.com"

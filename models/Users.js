@@ -5,7 +5,8 @@ module.exports = function(sequelize, DataTypes) {
 		UserId: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
-			primaryKey: true
+			primaryKey: true,
+			autoIncrement: true,
 		},
 		PrimaryEmail: {
 			type: DataTypes.STRING,
@@ -44,7 +45,7 @@ module.exports = function(sequelize, DataTypes) {
 			}
 		},
 		LastLoggedIn: {
-			type: DataTypes.DATE,
+			type: DataTypes.STRING,
 			allowNull: false,
 		},
 		OptInData: {
@@ -72,7 +73,7 @@ module.exports = function(sequelize, DataTypes) {
 			allowNull: false
 		},
 		DateOfBirth: {
-			type: DataTypes.DATE,
+			type: DataTypes.STRING,
 			allowNull: false,
 		}
 	}, {

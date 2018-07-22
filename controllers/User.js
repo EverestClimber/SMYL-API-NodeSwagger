@@ -4,6 +4,7 @@ var utils = require('../utils/writer.js');
 var Sequelize = require('sequelize');
 var Users = require('../models').Users;
 var LookupCommunicators = require('../models').LookupCommunicators;
+var UserContents = require('../models').UserContents;
 var auth = require("../utils/auth");
 const Op = Sequelize.Op;
 module.exports.createUser = function createUser (req, res, next) {
@@ -13,7 +14,7 @@ module.exports.createUser = function createUser (req, res, next) {
     Users
       .build(user)
       .save()
-      .then.then(result => result == null ? reject() : resolve(result))
+      .then(result => result == null ? reject() : resolve(result))
   })
   .then(response => {
     utils.writeJson(res, response);
@@ -132,3 +133,95 @@ module.exports.updateUser = function updateUser (req, res, next) {
     utils.writeJson(res, utils.respondWithCode(400, {error: 400, type: "error", message: "error"}))
   })
 };
+
+module.exports.getContentById = function getContentById (req, res, next) {
+  var id = req.swagger.params['id'].value;
+  var content = req.swagger.params['content'].value;
+  var userContents = {
+		SentenceCount: 0,
+		UnusualWordCount: 0,
+		QuestionsCount:0,
+		ExclamationPointCount: 0,
+		LongestSentenceWordCount: 0,
+		Classification: 0,
+		ContentId: 0,
+		ParentContentId: 0,
+		Score: Math.floor(Math.random() * (100 - 20)) + 20,
+		CharacterCount: 0,
+		WordCount: 0
+  };
+
+  userContents.ContentsText = content.contentsText;
+  userContents.AuthoredDate = new Date(content.authoredDate).toISOString().replace('T',' ').slice(0, -1);
+  userContents.UserId = id;
+
+  var promise1 = new Promise((resolve, reject) => 
+    Users.findOne({
+      where: {UserId: id}
+    })
+    .then(
+      result => {
+        if (result == null)
+          reject();
+        else{
+          userContents.CompanyId = result["dataValues"].CompanyId;
+          resolve();
+        } 
+      }
+    )
+    .catch(() => reject())
+  ) 
+
+  var promise2 = new Promise( (resolve, reject) => 
+    Users.findOne({
+      where: {
+        [Op.or]: [{PrimaryEmail: content.recipientEmail}, {SecondaryEmail: content.recipientEmail}]
+      }
+    })
+    .then(
+      result => {
+        if (result == null)
+          Users.create({
+            PrimaryEmail: content.recipientEmail,
+            SecondaryEmail: "",
+            Title: 1,
+            FirstName: "",
+            LastName: "",
+            Language: 1,
+            LanguageProficency: 1,
+            CompanyId: 1,
+            LastLoggedIn: new Date().toISOString().replace('T',' ').slice(0, -1),
+            OptInData: 1,
+            CommunicatorId: 1,
+            BelbinPreferred: 0,
+            Mbti: 0,
+            Gender: 2,
+            DateOfBirth: new Date().toISOString().replace('T',' ').slice(0, -1)
+          }).then(response => {
+            userContents.RecipientId = response["dataValues"].UserId;
+            resolve();
+          })
+          .catch(() => reject())
+        else{
+          userContents.RecipientId = result["dataValues"].UserId;
+          resolve();
+        }
+      },
+      error => {
+        reject();
+      }
+    )
+  )
+
+  Promise.all([promise1, promise2]).then(() => {
+    UserContents.create(userContents)
+    .then(result => {
+      utils.writeJson(res, {score: result["dataValues"].Score});
+    })
+  })
+  .catch(() => {
+    utils.writeJson(res, utils.respondWithCode(400, {error: 400, type: "error", message: "error"}))
+  })
+
+  
+}

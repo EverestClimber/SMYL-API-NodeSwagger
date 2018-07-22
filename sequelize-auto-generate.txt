@@ -1,0 +1,1 @@
+ sequelize-auto -o "./model1s" -d Version1 -h machinelearningdev.database.windows.net -u Happy -x Lucky5lug! -e mssql -c sequelize-auto-config.json
