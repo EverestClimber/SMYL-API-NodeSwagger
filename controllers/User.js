@@ -143,7 +143,7 @@ module.exports.getContentById = function getContentById (req, res, next) {
 		QuestionsCount:0,
 		ExclamationPointCount: 0,
 		LongestSentenceWordCount: 0,
-		Classification: 0,
+		ClassificationId: 0,
 		ContentId: 0,
 		ParentContentId: 0,
 		Score: Math.floor(Math.random() * (100 - 20)) + 20,

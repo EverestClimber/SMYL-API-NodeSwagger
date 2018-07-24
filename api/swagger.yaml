@@ -217,7 +217,7 @@ paths:
     put:
       tags:
       - "user"
-      summary: "Get a usercontent by id"
+      summary: "Store contents and get a score"
       operationId: "getContentById"
       produces:
       - "application/json"
