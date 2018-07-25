@@ -76,7 +76,34 @@ module.exports.getUserByEmail = function getUserByEmail (req, res, next) {
     
   })
   .catch(() => {
-    utils.writeJson(res, utils.respondWithCode(400, {error: 400, type: "error", message: "not found"}))
+    Users.create({
+      PrimaryEmail: email,
+      SecondaryEmail: "",
+      Title: 1,
+      FirstName: "",
+      LastName: "",
+      Language: 1,
+      LanguageProficency: 1,
+      CompanyId: 1,
+      LastLoggedIn: new Date().toISOString().replace('T',' ').slice(0, -1),
+      OptInData: 1,
+      CommunicatorId: 1,
+      BelbinPreferred: 0,
+      Mbti: 0,
+      Gender: 2,
+      DateOfBirth: new Date().toISOString().replace('T',' ').slice(0, -1),
+      Status: 0,
+    }).then(response => {
+      getCommunicatorDetailsById(response["dataValues"]["CommunicatorId"])
+      .then(response1 => {
+        response["dataValues"]['CommunicatorName'] = response1.CommunicatorName;
+        response["dataValues"]['Summary'] = response1.Summary;
+        utils.writeJson(res, response["dataValues"]);
+      })
+      .catch(() => {
+        utils.writeJson(res, response["dataValues"]);
+      })
+    })
   })
 };
 

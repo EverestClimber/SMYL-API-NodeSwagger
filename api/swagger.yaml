@@ -411,6 +411,8 @@ definitions:
         type: "string"
       summary:
         type: "string"
+      status:
+        type: "integer"
     example:
       optInData: 2
       lastName: "lastName"
@@ -430,6 +432,7 @@ definitions:
       primaryEmail: "primaryEmail"
       communicatorName: "communicatorName"
       summary: "summary"
+      status: 0
   Response_API:
     type: "object"
     properties:
