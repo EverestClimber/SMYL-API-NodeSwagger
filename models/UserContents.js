@@ -28,7 +28,7 @@ module.exports = function(sequelize, DataTypes) {
 			type: DataTypes.INTEGER,
 			allowNull: false
 		},
-		Classification: {
+		ClassificationId: {
 			type: DataTypes.INTEGER,
 			allowNull: false
 		},

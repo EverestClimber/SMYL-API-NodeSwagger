@@ -170,7 +170,7 @@ module.exports.getContentById = function getContentById (req, res, next) {
 		QuestionsCount:0,
 		ExclamationPointCount: 0,
 		LongestSentenceWordCount: 0,
-		Classification: 0,
+		ClassificationId: 0,
 		ContentId: 0,
 		ParentContentId: 0,
 		Score: Math.floor(Math.random() * (100 - 20)) + 20,
@@ -211,18 +211,18 @@ module.exports.getContentById = function getContentById (req, res, next) {
           Users.create({
             PrimaryEmail: content.recipientEmail,
             SecondaryEmail: "",
-            Title: 1,
+            Title: 0,
             FirstName: "",
             LastName: "",
-            Language: 1,
-            LanguageProficency: 1,
-            CompanyId: 1,
+            Language: 0,
+            LanguageProficency: 0,
+            CompanyId: 0,
             LastLoggedIn: new Date().toISOString().replace('T',' ').slice(0, -1),
             OptInData: 1,
-            CommunicatorId: 1,
+            CommunicatorId: 0,
             BelbinPreferred: 0,
             Mbti: 0,
-            Gender: 2,
+            Gender: 0,
             DateOfBirth: new Date().toISOString().replace('T',' ').slice(0, -1)
           }).then(response => {
             userContents.RecipientId = response["dataValues"].UserId;
