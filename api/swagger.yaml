@@ -3,10 +3,10 @@ swagger: "2.0"
 info:
   description: "This is our SMYL API"
   version: "1.0.0"
-  title: "Joanna API"
+  title: "SMYL API"
   termsOfService: "https://smylglobal.com/terms/"
   contact:
-    email: "joey.miller@me.com"
+    email: "joanna.miller@smyl.com"
   license:
     name: "SMYL License 1.0"
     url: "https://smylglobal.com/licenses/LICENSE-1.0.html"
@@ -518,4 +518,4 @@ definitions:
         type: "integer"
 externalDocs:
   description: "Find out more about SMYL"
-  url: "https://smylglobal.com"
+  url: "https://smyl.com"
