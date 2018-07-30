@@ -498,6 +498,10 @@ definitions:
         type: "string"
       authoredDate:
         type: "string"
+      messageConversationId:
+        type: "string"
+      subject:
+        type: "string"
     example:
       recipientEmail: "example@gmail.com"
       contentsText: "example content"
@@ -506,8 +510,11 @@ definitions:
     type: "object"
     required: 
     - "score"
+    - "userContentId"
     properties:
       score:
+        type: "integer"
+      userContentId:
         type: "integer"
 externalDocs:
   description: "Find out more about SMYL"

@@ -57,7 +57,7 @@ module.exports = function(sequelize, DataTypes) {
 			allowNull: false
 		},
 		AuthoredDate: {
-			type: DataTypes.DATEONLY,
+			type: DataTypes.STRING,
 			allowNull: false
 		},
 		ContentsText: {
