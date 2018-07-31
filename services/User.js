@@ -4,6 +4,58 @@ var LookupCommunicators = require('../models').LookupCommunicators;
 var UserContents = require('../models').UserContents;
 const Op = require('sequelize').Op;
 
+GenerateUsersObject = (obj) => {
+    var obj_user = {
+        PrimaryEmail:           "",
+        SecondaryEmail:         "",
+        Title:                  0,
+        FirstName:              "",
+        LastName:               "",
+        Language:               0,
+        LanguageProficency:     0,
+        CompanyId:              0,
+        LastLoggedIn:           new Date().toISOString().replace('T',' ').slice(0, -1),
+        OptInData:              1,
+        CommunicatorId:         0,
+        BelbinPreferred:        0,
+        Mbti:                   0,
+        Gender:                 0,
+        DateOfBirth:            new Date().toISOString().replace('T',' ').slice(0, -1),
+        Status:                 2
+    }
+    for (key in obj)
+        obj_user[key] = obj[key];
+    return Users.create(obj_user);
+}
+
+GenerateUserContentsObject = (obj) => {
+    var obj_userContent = 
+    {
+          SentenceCount:                0,
+          UnusualWordCount:             0,
+          QuestionsCount:               0,
+          ExclamationPointCount:        0,
+          LongestSentenceWordCount:     0,
+          ClassificationId:             0,
+          ContentId:                    0,
+          ParentContentId:              0,
+          Score:                        0,
+          CharacterCount:               0,
+          WordCount:                    0,
+          ContentsText:                 "",
+          AuthoredDate:                 new Date().toISOString().replace('T',' ').slice(0, -1),
+          UserId:                       0,
+          MessageConversationId:        0,
+          Subject:                      "",
+          CompanyId:                    0,
+          RecipientId:                  0,
+    };
+
+    for (key in obj)
+        obj_userContent[key] = obj[key];
+    return UserContents.create(obj_userContent);
+}
+
 exports.getUserByEmail = async (req, res, next) => {
     /* fetching paramter : email - path */
     var req_email = req.swagger.params['email'].value;
@@ -18,22 +70,8 @@ exports.getUserByEmail = async (req, res, next) => {
 
         if (obj_user == null) {
             // Creating new User
-            obj_user = await Users.create({
-                PrimaryEmail:           req_email,
-                SecondaryEmail:         "",
-                Title:                  0,
-                FirstName:              "",
-                LastName:               "",
-                Language:               0,
-                LanguageProficency:     0,
-                CompanyId:              0,
-                LastLoggedIn:           new Date().toISOString().replace('T',' ').slice(0, -1),
-                OptInData:              1,
-                CommunicatorId:         0,
-                BelbinPreferred:        0,
-                Mbti:                   0,
-                Gender:                 0,
-                DateOfBirth:            new Date().toISOString().replace('T',' ').slice(0, -1),
+            obj_user = await GenerateUsersObject({
+                PrimaryEmail:   req_email
             })
             // Responding error if there is error in creating new user
             if (obj_user == null) throw new Error("Cannot Create User")
@@ -72,24 +110,13 @@ exports.getContentById = async (req, res, next) => {
     var req_content =   req.swagger.params['content'].value;
     var obj_userContents = 
     {
-          SentenceCount:                0,
-          UnusualWordCount:             0,
-          QuestionsCount:               0,
-          ExclamationPointCount:        0,
-          LongestSentenceWordCount:     0,
-          ClassificationId:             0,
-          ContentId:                    0,
-          ParentContentId:              0,
-          Score:                        Math.floor(Math.random() * (100 - 20)) + 20,
-          CharacterCount:               0,
-          WordCount:                    0
+          Score:                    Math.floor(Math.random() * (100 - 20)) + 20,
+          ContentsText:             req_content.contentsText,
+          AuthoredDate:             new Date(req_content.authoredDate).toISOString().replace('T',' ').slice(0, -1),
+          UserId:                   req_id,
+          MessageConversationId:    req_content.messageConversationId,
+          Subject:                  req_content.subject,
     };
-  
-    obj_userContents.ContentsText =             req_content.contentsText;
-    obj_userContents.AuthoredDate =             new Date(req_content.authoredDate).toISOString().replace('T',' ').slice(0, -1);
-    obj_userContents.UserId =                   req_id;
-    obj_userContents.MessageConversationId =    req_content.messageConversationId;
-    obj_userContents.Subject =                  req_content.subject;
     
     // implementing API functionalities
     try {
@@ -112,22 +139,8 @@ exports.getContentById = async (req, res, next) => {
 
         if (user_find_userId == null) {
             // if matching UserId is not found, then create a new User table entry and then save into database UserContents.RecipientId
-            const obj_user = await Users.create({
-                PrimaryEmail:           req_content.recipientEmail,
-                SecondaryEmail:         "",
-                Title:                  0,
-                FirstName:              "",
-                LastName:               "",
-                Language:               0,
-                LanguageProficency:     0,
-                CompanyId:              0,
-                LastLoggedIn:           new Date().toISOString().replace('T',' ').slice(0, -1),
-                OptInData:              1,
-                CommunicatorId:         0,
-                BelbinPreferred:        0,
-                Mbti:                   0,
-                Gender:                 0,
-                DateOfBirth:            new Date().toISOString().replace('T',' ').slice(0, -1),
+            const obj_user = await GenerateUsersObject({
+                PrimaryEmail:   req_content.recipientEmail
             })
 
             if (obj_user == null) 
@@ -140,7 +153,7 @@ exports.getContentById = async (req, res, next) => {
             obj_userContents.RecipientId = user_find_userId["dataValues"].UserId;
   
         // creating new object in UserContents and responding 'Score' & 'UserContentID'
-        const userContents_for_score_id = await UserContents.create(obj_userContents);
+        const userContents_for_score_id = await GenerateUserContentsObject(obj_userContents);
         utils.writeJson(res, {
             score: userContents_for_score_id["dataValues"].Score, 
             userContentId: userContents_for_score_id["dataValues"].UserContentId
