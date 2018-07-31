@@ -79,7 +79,15 @@ module.exports = function(sequelize, DataTypes) {
 		WordCount: {
 			type: DataTypes.INTEGER,
 			allowNull: false
-		}
+		},
+		Subject: {
+			type: DataTypes.STRING,
+			allowNull: true
+		},
+		MessageConversationId: {
+			type: DataTypes.INTEGER,
+			allowNull: true
+		},
 	}, {
 		tableName: 'UserContents',
 		timestamps: false,

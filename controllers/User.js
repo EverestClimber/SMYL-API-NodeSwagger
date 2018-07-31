@@ -6,6 +6,8 @@ var Users = require('../models').Users;
 var LookupCommunicators = require('../models').LookupCommunicators;
 var UserContents = require('../models').UserContents;
 var auth = require("../utils/auth");
+
+var service_User = require('../services/User');
 const Op = Sequelize.Op;
 module.exports.createUser = function createUser (req, res, next) {
   var user = req.swagger.params['user'].value;
@@ -162,93 +164,5 @@ module.exports.updateUser = function updateUser (req, res, next) {
 };
 
 module.exports.getContentById = function getContentById (req, res, next) {
-  var id = req.swagger.params['id'].value;
-  var content = req.swagger.params['content'].value;
-  var userContents = {
-		SentenceCount: 0,
-		UnusualWordCount: 0,
-		QuestionsCount:0,
-		ExclamationPointCount: 0,
-		LongestSentenceWordCount: 0,
-		ClassificationId: 0,
-		ContentId: 0,
-		ParentContentId: 0,
-		Score: Math.floor(Math.random() * (100 - 20)) + 20,
-		CharacterCount: 0,
-		WordCount: 0
-  };
-
-  userContents.ContentsText = content.contentsText;
-  userContents.AuthoredDate = new Date(content.authoredDate).toISOString().replace('T',' ').slice(0, -1);
-  userContents.UserId = id;
-
-  var promise1 = new Promise((resolve, reject) => 
-    Users.findOne({
-      where: {UserId: id}
-    })
-    .then(
-      result => {
-        if (result == null)
-          reject();
-        else{
-          userContents.CompanyId = result["dataValues"].CompanyId;
-          resolve();
-        } 
-      }
-    )
-    .catch(() => reject())
-  ) 
-
-  var promise2 = new Promise( (resolve, reject) => 
-    Users.findOne({
-      where: {
-        [Op.or]: [{PrimaryEmail: content.recipientEmail}, {SecondaryEmail: content.recipientEmail}]
-      }
-    })
-    .then(
-      result => {
-        if (result == null)
-          Users.create({
-            PrimaryEmail: content.recipientEmail,
-            SecondaryEmail: "",
-            Title: 0,
-            FirstName: "",
-            LastName: "",
-            Language: 0,
-            LanguageProficency: 0,
-            CompanyId: 0,
-            LastLoggedIn: new Date().toISOString().replace('T',' ').slice(0, -1),
-            OptInData: 1,
-            CommunicatorId: 0,
-            BelbinPreferred: 0,
-            Mbti: 0,
-            Gender: 0,
-            DateOfBirth: new Date().toISOString().replace('T',' ').slice(0, -1)
-          }).then(response => {
-            userContents.RecipientId = response["dataValues"].UserId;
-            resolve();
-          })
-          .catch(() => reject())
-        else{
-          userContents.RecipientId = result["dataValues"].UserId;
-          resolve();
-        }
-      },
-      error => {
-        reject();
-      }
-    )
-  )
-
-  Promise.all([promise1, promise2]).then(() => {
-    UserContents.create(userContents)
-    .then(result => {
-      utils.writeJson(res, {score: result["dataValues"].Score});
-    })
-  })
-  .catch(() => {
-    utils.writeJson(res, utils.respondWithCode(400, {error: 400, type: "error", message: "error"}))
-  })
-
-  
+  service_User.getContentById(req, res, next);
 }

@@ -491,6 +491,8 @@ definitions:
     - "recipientEmail"
     - "contentsText"
     - "authoredDate"
+    - "messageConversationId"
+    - "subject"
     properties:
       recipientEmail:
         type: "string"
@@ -499,13 +501,15 @@ definitions:
       authoredDate:
         type: "string"
       messageConversationId:
-        type: "string"
+        type: "integer"
       subject:
         type: "string"
     example:
       recipientEmail: "example@gmail.com"
       contentsText: "example content"
-      authoredDate: ""
+      authoredDate: "2017-07-21T12:48:22.237Z"
+      subject: "subject"
+      messageConversationId: 100
   Response_getContentById:
     type: "object"
     required: 
