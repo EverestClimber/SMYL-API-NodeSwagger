@@ -5,6 +5,15 @@ var UserContents = require('../models').UserContents;
 const Op = require('sequelize').Op;
 
 exports.getContentById = async (req, res, next) => {
+    /* fetching paramters : id - path, content - body
+    
+    ContentsText --> UserContents.ContentsText
+    AuthoredDate --> UserContents.AuthoredDate
+    Subject --> UserContents.Subject
+    MessageConversationId --> UserContents.MessageConversationId
+    taken from PUT {id} --> UserContents.UserId
+
+    */
     var req_id =        req.swagger.params['id'].value;
     var req_content =   req.swagger.params['content'].value;
     var obj_userContents = 
@@ -27,8 +36,11 @@ exports.getContentById = async (req, res, next) => {
     obj_userContents.UserId =                   req_id;
     obj_userContents.MessageConversationId =    req_content.messageConversationId;
     obj_userContents.Subject =                  req_content.subject;
-  
+    
+    // implementing API functionalities
     try {
+
+        // taken from PUT {id} and lookup User record for matching User.CompanyId --> UserContents.CompanyId
         const user_find_companyId = await Users.findOne({
             where: {UserId: req_id}
         })
@@ -37,6 +49,7 @@ exports.getContentById = async (req, res, next) => {
         else 
             throw new Error("No company ID")
         
+        // RecipientEmail --> lookup User table
         const user_find_userId = await Users.findOne({
             where: {
                 [Op.or]: [{PrimaryEmail: req_content.recipientEmail}, {SecondaryEmail: req_content.recipientEmail}]
@@ -44,6 +57,7 @@ exports.getContentById = async (req, res, next) => {
         })
 
         if (user_find_userId == null) {
+            // if matching UserId is not found, then create a new User table entry and then save into database UserContents.RecipientId
             const obj_user = await Users.create({
                 PrimaryEmail:       req_content.recipientEmail,
                 SecondaryEmail:     "",
@@ -64,8 +78,10 @@ exports.getContentById = async (req, res, next) => {
             obj_userContents.RecipientId = obj_user["dataValues"].UserId;
         }
         else 
+            // If UserId is matching, save that into database UserContents.RecipientId
             obj_userContents.RecipientId = user_find_userId["dataValues"].UserId;
   
+        // creating new object in UserContents and responding 'Score' & 'UserContentID'
         const userContents_for_score_id = await UserContents.create(obj_userContents);
         utils.writeJson(res, {
             score: userContents_for_score_id["dataValues"].Score, 
