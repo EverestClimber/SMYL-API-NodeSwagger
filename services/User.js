@@ -21,22 +21,24 @@ exports.getUserByEmail = async (req, res, next) => {
             obj_user = await Users.create({
                 PrimaryEmail:           req_email,
                 SecondaryEmail:         "",
-                Title:                  1,
+                Title:                  0,
                 FirstName:              "",
                 LastName:               "",
-                Language:               1,
-                LanguageProficency:     1,
-                CompanyId:              1,
+                Language:               0,
+                LanguageProficency:     0,
+                CompanyId:              0,
                 LastLoggedIn:           new Date().toISOString().replace('T',' ').slice(0, -1),
                 OptInData:              1,
-                CommunicatorId:         1,
+                CommunicatorId:         0,
                 BelbinPreferred:        0,
                 Mbti:                   0,
-                Gender:                 2,
+                Gender:                 0,
                 DateOfBirth:            new Date().toISOString().replace('T',' ').slice(0, -1),
             })
             // Responding error if there is error in creating new user
             if (obj_user == null) throw new Error("Cannot Create User")
+            // if rebrand email, set key/value like below
+            obj_user["dataValues"]["RecipientStatusId"] = 2;
         }
         // Returning Communicator Name and Summary from the LookupCommunications table
         const lookupCommunicators_for_summary_communicatorName = await LookupCommunicators.findOne({
