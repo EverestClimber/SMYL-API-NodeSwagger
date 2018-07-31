@@ -43,70 +43,9 @@ module.exports.deleteUser = function deleteUser (req, res, next) {
   })
 };
 
-const getCommunicatorDetailsById = (id) => {
-  console.log("getCommunicatorDetailsById")
-  return new Promise((resolve, reject) => {
-    LookupCommunicators.findOne({
-      where: {
-        CommunicatorId: id
-      },
-    })
-    .then(result => {console.log(result);result == null ? reject() : resolve(result)})
-  });
-}
 
 module.exports.getUserByEmail = function getUserByEmail (req, res, next) {
-  var email = req.swagger.params['email'].value;
-  new Promise(function(resolve, reject) {
-    Users.findOne({
-      where: {
-        [Op.or]: [{PrimaryEmail: email}, {SecondaryEmail: email}]
-      },
-    })
-    .then(result => result == null ? reject() : resolve(result))
-  })
-  .then(response => {
-    getCommunicatorDetailsById(response["dataValues"]["CommunicatorId"])
-    .then(response1 => {
-      response["dataValues"]['CommunicatorName'] = response1.CommunicatorName;
-      response["dataValues"]['Summary'] = response1.Summary;
-      utils.writeJson(res, response);
-    })
-    .catch(() => {
-      utils.writeJson(res, response);
-    })
-    
-  })
-  .catch(() => {
-    Users.create({
-      PrimaryEmail: email,
-      SecondaryEmail: "",
-      Title: 1,
-      FirstName: "",
-      LastName: "",
-      Language: 1,
-      LanguageProficency: 1,
-      CompanyId: 1,
-      LastLoggedIn: new Date().toISOString().replace('T',' ').slice(0, -1),
-      OptInData: 1,
-      CommunicatorId: 1,
-      BelbinPreferred: 0,
-      Mbti: 0,
-      Gender: 2,
-      DateOfBirth: new Date().toISOString().replace('T',' ').slice(0, -1),
-      Status: 0,
-    }).then(response => {
-      getCommunicatorDetailsById(response["dataValues"]["CommunicatorId"])
-      .then(response1 => {
-        response["dataValues"]['CommunicatorName'] = response1.CommunicatorName;
-        response["dataValues"]['Summary'] = response1.Summary;
-        utils.writeJson(res, response["dataValues"]);
-      })
-      .catch(() => {
-        utils.writeJson(res, response["dataValues"]);
-      })
-    })
-  })
+  service_User.getUserByEmail(req, res, next);
 };
 
 module.exports.getUserById = function getUserById (req, res, next) {

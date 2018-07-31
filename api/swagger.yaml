@@ -355,6 +355,14 @@ definitions:
         type: "integer"
       dateOfBirth:
         type: "string"
+      password:
+        type: "string"
+      dateTimeCreated:
+        type: "string"
+      dateTimeModified:
+        type: "string"
+      status:
+        type: "integer"
     example:
       optInData: 2
       lastName: "lastName"
@@ -372,6 +380,10 @@ definitions:
       lastLoggedIn: "2000-01-23T04:56:07.000+00:00"
       mbti: 3
       primaryEmail: "primaryEmail"
+      password: "password"
+      dateTimeCreated: "2000-01-23T04:56:07.000+00:00"
+      dateTimeModified: "2000-01-23T04:56:07.000+00:00"
+      status: 0
   User_getUserbyEmail:
     type: "object"
     properties:

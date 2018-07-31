@@ -4,6 +4,55 @@ var LookupCommunicators = require('../models').LookupCommunicators;
 var UserContents = require('../models').UserContents;
 const Op = require('sequelize').Op;
 
+exports.getUserByEmail = async (req, res, next) => {
+    var req_email = req.swagger.params['email'].value;
+
+    try {
+        var obj_user = await Users.findOne({
+            where: {
+                [Op.or]: [{PrimaryEmail: req_email}, {SecondaryEmail: req_email}]
+            },
+        })
+
+        if (obj_user == null) {
+            obj_user = await Users.create({
+                PrimaryEmail:           req_email,
+                SecondaryEmail:         "",
+                Title:                  1,
+                FirstName:              "",
+                LastName:               "",
+                Language:               1,
+                LanguageProficency:     1,
+                CompanyId:              1,
+                LastLoggedIn:           new Date().toISOString().replace('T',' ').slice(0, -1),
+                OptInData:              1,
+                CommunicatorId:         1,
+                BelbinPreferred:        0,
+                Mbti:                   0,
+                Gender:                 2,
+                DateOfBirth:            new Date().toISOString().replace('T',' ').slice(0, -1),
+            })
+
+            if (obj_user == null) throw new Error("Cannot Create User")
+        }
+        
+        const lookupCommunicators_for_summary_communicatorName = await LookupCommunicators.findOne({
+            where: {
+              CommunicatorId: obj_user["dataValues"]["CommunicatorId"]
+            },
+        })
+
+        if (lookupCommunicators_for_summary_communicatorName != null ) {
+            obj_user["dataValues"]['CommunicatorName'] =    lookupCommunicators_for_summary_communicatorName.CommunicatorName;
+            obj_user["dataValues"]['Summary'] =             lookupCommunicators_for_summary_communicatorName.Summary;
+        }
+        utils.writeJson(res, obj_user);
+    }
+    catch(error) {
+        utils.writeJson(res, utils.respondWithCode(400, {error: 400, type: "error", message: error.message}))
+    }
+}
+
 exports.getContentById = async (req, res, next) => {
     /* fetching paramters : id - path, content - body
     
@@ -18,17 +67,17 @@ exports.getContentById = async (req, res, next) => {
     var req_content =   req.swagger.params['content'].value;
     var obj_userContents = 
     {
-          SentenceCount:            0,
-          UnusualWordCount:         0,
-          QuestionsCount:           0,
-          ExclamationPointCount:    0,
-          LongestSentenceWordCount: 0,
-          ClassificationId:         0,
-          ContentId:                0,
-          ParentContentId:          0,
-          Score:                    Math.floor(Math.random() * (100 - 20)) + 20,
-          CharacterCount:           0,
-          WordCount:                0
+          SentenceCount:                0,
+          UnusualWordCount:             0,
+          QuestionsCount:               0,
+          ExclamationPointCount:        0,
+          LongestSentenceWordCount:     0,
+          ClassificationId:             0,
+          ContentId:                    0,
+          ParentContentId:              0,
+          Score:                        Math.floor(Math.random() * (100 - 20)) + 20,
+          CharacterCount:               0,
+          WordCount:                    0
     };
   
     obj_userContents.ContentsText =             req_content.contentsText;
@@ -59,23 +108,27 @@ exports.getContentById = async (req, res, next) => {
         if (user_find_userId == null) {
             // if matching UserId is not found, then create a new User table entry and then save into database UserContents.RecipientId
             const obj_user = await Users.create({
-                PrimaryEmail:       req_content.recipientEmail,
-                SecondaryEmail:     "",
-                Title:              0,
-                FirstName:          "",
-                LastName:           "",
-                Language:           0,
-                LanguageProficency: 0,
-                CompanyId:          0,
-                LastLoggedIn:       new Date().toISOString().replace('T',' ').slice(0, -1),
-                OptInData:          1,
-                CommunicatorId:     0,
-                BelbinPreferred:    0,
-                Mbti:               0,
-                Gender:             0,
-                DateOfBirth:        new Date().toISOString().replace('T',' ').slice(0, -1),
+                PrimaryEmail:           req_content.recipientEmail,
+                SecondaryEmail:         "",
+                Title:                  0,
+                FirstName:              "",
+                LastName:               "",
+                Language:               0,
+                LanguageProficency:     0,
+                CompanyId:              0,
+                LastLoggedIn:           new Date().toISOString().replace('T',' ').slice(0, -1),
+                OptInData:              1,
+                CommunicatorId:         0,
+                BelbinPreferred:        0,
+                Mbti:                   0,
+                Gender:                 0,
+                DateOfBirth:            new Date().toISOString().replace('T',' ').slice(0, -1),
             })
-            obj_userContents.RecipientId = obj_user["dataValues"].UserId;
+
+            if (obj_user == null) 
+                throw new Error("Cannot Create User")
+            else
+                obj_userContents.RecipientId = obj_user["dataValues"].UserId;
         }
         else 
             // If UserId is matching, save that into database UserContents.RecipientId
@@ -89,6 +142,6 @@ exports.getContentById = async (req, res, next) => {
         });
     }
     catch(error) {
-        utils.writeJson(res, utils.respondWithCode(400, {error: 400, type: "error", message: "error"}))
+        utils.writeJson(res, utils.respondWithCode(400, {error: 400, type: "error", message: error.message}))
     }
 }
