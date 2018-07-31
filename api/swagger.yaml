@@ -503,8 +503,6 @@ definitions:
     - "recipientEmail"
     - "contentsText"
     - "authoredDate"
-    - "messageConversationId"
-    - "subject"
     properties:
       recipientEmail:
         type: "string"

@@ -96,7 +96,7 @@ exports.getContentById = async (req, res, next) => {
         if (user_find_companyId != null) 
             obj_userContents.CompanyId = user_find_companyId["dataValues"].CompanyId;
         else 
-            throw new Error("No company ID")
+            throw new Error("User id in the api path doesn't exist ")
         
         // RecipientEmail --> lookup User table
         const user_find_userId = await Users.findOne({
