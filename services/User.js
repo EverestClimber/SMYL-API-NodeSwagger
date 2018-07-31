@@ -5,9 +5,11 @@ var UserContents = require('../models').UserContents;
 const Op = require('sequelize').Op;
 
 exports.getUserByEmail = async (req, res, next) => {
+    /* fetching paramter : email - path */
     var req_email = req.swagger.params['email'].value;
 
     try {
+        // find Users object having email value as primaryemail or secondaryemail
         var obj_user = await Users.findOne({
             where: {
                 [Op.or]: [{PrimaryEmail: req_email}, {SecondaryEmail: req_email}]
@@ -15,6 +17,7 @@ exports.getUserByEmail = async (req, res, next) => {
         })
 
         if (obj_user == null) {
+            // Creating new User
             obj_user = await Users.create({
                 PrimaryEmail:           req_email,
                 SecondaryEmail:         "",
@@ -32,10 +35,10 @@ exports.getUserByEmail = async (req, res, next) => {
                 Gender:                 2,
                 DateOfBirth:            new Date().toISOString().replace('T',' ').slice(0, -1),
             })
-
+            // Responding error if there is error in creating new user
             if (obj_user == null) throw new Error("Cannot Create User")
         }
-        
+        // Returning Communicator Name and Summary from the LookupCommunications table
         const lookupCommunicators_for_summary_communicatorName = await LookupCommunicators.findOne({
             where: {
               CommunicatorId: obj_user["dataValues"]["CommunicatorId"]
