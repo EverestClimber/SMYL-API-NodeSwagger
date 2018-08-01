@@ -4,6 +4,12 @@ var LookupCommunicators = require('../models').LookupCommunicators;
 var UserContents = require('../models').UserContents;
 const Op = require('sequelize').Op;
 
+GenerateDateObject = (dateValue) => {
+    return dateValue == undefined  ? 
+        new Date().toISOString().replace('T',' ').slice(0, -1) : 
+        new Date(dateValue).toISOString().replace('T',' ').slice(0, -1)
+}
+
 GenerateUsersObject = (obj) => {
     var obj_user = {
         PrimaryEmail:           "",
@@ -14,18 +20,18 @@ GenerateUsersObject = (obj) => {
         Language:               0,
         LanguageProficency:     0,
         CompanyId:              0,
-        LastLoggedIn:           new Date().toISOString().replace('T',' ').slice(0, -1),
+        LastLoggedIn:           GenerateDateObject(),
         OptInData:              1,
         CommunicatorId:         0,
         BelbinPreferred:        0,
         Mbti:                   0,
         Gender:                 0,
-        DateOfBirth:            new Date().toISOString().replace('T',' ').slice(0, -1),
+        DateOfBirth:            GenerateDateObject(),
         Status:                 2
     }
     for (key in obj)
         obj_user[key] = obj[key];
-    return Users.create(obj_user);
+    return obj_user;
 }
 
 GenerateUserContentsObject = (obj) => {
@@ -43,7 +49,7 @@ GenerateUserContentsObject = (obj) => {
           CharacterCount:               0,
           WordCount:                    0,
           ContentsText:                 "",
-          AuthoredDate:                 new Date().toISOString().replace('T',' ').slice(0, -1),
+          AuthoredDate:                 GenerateDateObject(),
           UserId:                       0,
           MessageConversationId:        0,
           Subject:                      "",
@@ -53,26 +59,28 @@ GenerateUserContentsObject = (obj) => {
 
     for (key in obj)
         obj_userContent[key] = obj[key];
-    return UserContents.create(obj_userContent);
+    return obj_userContent;
 }
 
 exports.getUserByEmail = async (req, res, next) => {
     /* fetching paramter : email - path */
     var req_email = req.swagger.params['email'].value;
-
+    
     try {
         // find Users object having email value as primaryemail or secondaryemail
         var obj_user = await Users.findOne({
             where: {
                 [Op.or]: [{PrimaryEmail: req_email}, {SecondaryEmail: req_email}]
-            },
+            }
         })
 
         if (obj_user == null) {
             // Creating new User
-            obj_user = await GenerateUsersObject({
-                PrimaryEmail:   req_email
-            })
+            obj_user = await Users.create(
+                GenerateUsersObject({
+                    PrimaryEmail:   req_email
+                })
+            );
             // Responding error if there is error in creating new user
             if (obj_user == null) throw new Error("Cannot Create User")
             // if rebrand email, set key/value like below
@@ -89,6 +97,8 @@ exports.getUserByEmail = async (req, res, next) => {
             obj_user["dataValues"]['CommunicatorName'] =    lookupCommunicators_for_summary_communicatorName.CommunicatorName;
             obj_user["dataValues"]['Summary'] =             lookupCommunicators_for_summary_communicatorName.Summary;
         }
+        // update LastLoggedIn of user
+        const result_lastloggedin_update = await Users.update( { LastLoggedIn: GenerateDateObject() }, { where: { UserId: obj_user["dataValues"]["UserId"] } });
         utils.writeJson(res, obj_user);
     }
     catch(error) {
@@ -112,7 +122,7 @@ exports.getContentById = async (req, res, next) => {
     {
           Score:                    Math.floor(Math.random() * (100 - 20)) + 20,
           ContentsText:             req_content.contentsText,
-          AuthoredDate:             new Date(req_content.authoredDate).toISOString().replace('T',' ').slice(0, -1),
+          AuthoredDate:             GenerateDateObject(req_content.authoredDate),
           UserId:                   req_id,
           MessageConversationId:    req_content.messageConversationId,
           Subject:                  req_content.subject,
@@ -139,9 +149,11 @@ exports.getContentById = async (req, res, next) => {
 
         if (user_find_userId == null) {
             // if matching UserId is not found, then create a new User table entry and then save into database UserContents.RecipientId
-            const obj_user = await GenerateUsersObject({
-                PrimaryEmail:   req_content.recipientEmail
-            })
+            const obj_user = await await Users.create(
+                GenerateUsersObject({
+                    PrimaryEmail:   req_content.recipientEmail
+                })
+            );
 
             if (obj_user == null) 
                 throw new Error("Cannot Create User")
@@ -153,7 +165,9 @@ exports.getContentById = async (req, res, next) => {
             obj_userContents.RecipientId = user_find_userId["dataValues"].UserId;
   
         // creating new object in UserContents and responding 'Score' & 'UserContentID'
-        const userContents_for_score_id = await GenerateUserContentsObject(obj_userContents);
+        const userContents_for_score_id = await UserContents.create(
+            GenerateUserContentsObject(obj_userContents)
+        );
         utils.writeJson(res, {
             score: userContents_for_score_id["dataValues"].Score, 
             userContentId: userContents_for_score_id["dataValues"].UserContentId
