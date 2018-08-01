@@ -62,7 +62,7 @@ module.exports = function(sequelize, DataTypes) {
 		},
 		ContentsText: {
 			type: DataTypes.STRING,
-			allowNull: true
+			allowNull: false
 		},
 		ParentContentId: {
 			type: DataTypes.INTEGER,
@@ -82,11 +82,11 @@ module.exports = function(sequelize, DataTypes) {
 		},
 		Subject: {
 			type: DataTypes.STRING,
-			allowNull: true
+			allowNull: false
 		},
 		MessageConversationId: {
-			type: DataTypes.INTEGER,
-			allowNull: true
+			type: DataTypes.STRING,
+			allowNull: false
 		},
 	}, {
 		tableName: 'UserContents',

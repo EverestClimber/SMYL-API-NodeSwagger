@@ -519,7 +519,7 @@ definitions:
       authoredDate:
         type: "string"
       messageConversationId:
-        type: "integer"
+        type: "string"
       subject:
         type: "string"
     example:

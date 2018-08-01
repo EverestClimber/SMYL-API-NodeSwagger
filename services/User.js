@@ -51,7 +51,7 @@ GenerateUserContentsObject = (obj) => {
           ContentsText:                 "",
           AuthoredDate:                 GenerateDateObject(),
           UserId:                       0,
-          MessageConversationId:        0,
+          MessageConversationId:        "",
           Subject:                      "",
           CompanyId:                    0,
           RecipientId:                  0,
