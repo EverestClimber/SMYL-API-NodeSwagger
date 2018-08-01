@@ -18,6 +18,16 @@ module.exports = function(sequelize, DataTypes) {
 		AllowAccess: {
 			type: DataTypes.STRING,
 			allowNull: false
+		},
+		HistoricMessagesCount: {
+			type: DataTypes.INTEGER,
+			allowNull: true,
+			defaultValue: '((5))'
+		},
+		HistoricMessageMinChars: {
+			type: DataTypes.INTEGER,
+			allowNull: true,
+			defaultValue: '((300))'
 		}
 	}, {
 		tableName: 'LookupServices',
