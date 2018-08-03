@@ -65,21 +65,7 @@ module.exports.getUserById = function getUserById (req, res, next) {
 };
 
 module.exports.loginUser = function loginUser (req, res, next) {
-  var user = req.swagger.params['user'].value;
-  new Promise(function(resolve, reject) {
-    Users.findOne({
-      where: {
-        [Op.or]: [{PrimaryEmail: user.email}, {SecondaryEmail: user.email}]
-      }
-    })
-    .then(result => result == null ? reject() : resolve({token: auth.generateToken(result.dataValues)}))
-  })
-  .then(response => {
-    utils.writeJson(res, response);
-  })
-  .catch(() => {
-    utils.writeJson(res, utils.respondWithCode(400, {error: 400, type: "login failed", message: "User email or password should be valid"}))
-  })
+  service_User.loginUser(req, res, next);
 };
 
 module.exports.logoutUser = function logoutUser (req, res, next) {
