@@ -2,6 +2,7 @@ var utils = require('../utils/writer.js');
 var Users = require('../models').Users;
 var LookupCommunicators = require('../models').LookupCommunicators;
 var UserContents = require('../models').UserContents;
+var auth = require("../utils/auth");
 const Op = require('sequelize').Op;
 
 GenerateDateObject = (dateValue) => {
@@ -62,10 +63,31 @@ GenerateUserContentsObject = (obj) => {
     return obj_userContent;
 }
 
+exports.loginUser = async (req, res, next) => {
+    var user = req.swagger.params['user'].value;
+
+    try {
+        var obj_user = await Users.findOne({
+            where: {
+                [Op.or]: [{PrimaryEmail: user.email}, {SecondaryEmail: user.email}]
+            }
+        })
+        
+        if (obj_user == null) throw new Error("User email doesn't exist")
+
+        const result_lastloggedin_update = await Users.update( { LastLoggedIn: GenerateDateObject() }, { where: { UserId: obj_user["dataValues"]["UserId"] } });
+        if (result_lastloggedin_update.length > 0) console.log("successfully updated")
+
+        utils.writeJson(res, {token: auth.generateToken(obj_user["dataValues"])});
+    } catch(error) {
+        utils.writeJson(res, utils.respondWithCode(400, {error: 400, type: "error", message: error.message}))
+    }
+}
+
 exports.getUserByEmail = async (req, res, next) => {
     /* fetching paramter : email - path */
     var req_email = req.swagger.params['email'].value;
-    
+
     try {
         // find Users object having email value as primaryemail or secondaryemail
         var obj_user = await Users.findOne({
@@ -98,7 +120,6 @@ exports.getUserByEmail = async (req, res, next) => {
             obj_user["dataValues"]['Summary'] =             lookupCommunicators_for_summary_communicatorName.Summary;
         }
         // update LastLoggedIn of user
-        const result_lastloggedin_update = await Users.update( { LastLoggedIn: GenerateDateObject() }, { where: { UserId: obj_user["dataValues"]["UserId"] } });
         utils.writeJson(res, obj_user);
     }
     catch(error) {
