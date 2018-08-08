@@ -73,6 +73,9 @@ exports.loginUser = async (req, res, next) => {
     log(LOGTYPE.INFO, 'Request Params', req.swagger.params);
 
     try {
+        
+        log(LOGTYPE.INFO, 'api process...', 'find <email>:' + user.email + 'in <<Users>> table')
+
         var obj_user = await Users.findOne({
             where: {
                 [Op.or]: [{PrimaryEmail: user.email}, {SecondaryEmail: user.email}]
@@ -82,6 +85,7 @@ exports.loginUser = async (req, res, next) => {
         if (obj_user == null) throw new Error('User not found');
 
         log(LOGTYPE.INFO, 'User Found', obj_user["dataValues"])
+        log(LOGTYPE.INFO, 'api process...', 'update <LastLoggedIn> field for user')
 
         const result_lastloggedin_update = await Users.update( { LastLoggedIn: GenerateDateObject() }, { where: { UserId: obj_user["dataValues"]["UserId"] } });
 
@@ -112,6 +116,7 @@ exports.getUserByEmail = async (req, res, next) => {
 
     try {
         // find Users object having email value as primaryemail or secondaryemail
+        log(LOGTYPE.INFO, 'api process...', 'find <email>:' + req_email + 'in <Users> table')
         var obj_user = await Users.findOne({
             where: {
                 [Op.or]: [{PrimaryEmail: req_email}, {SecondaryEmail: req_email}]
@@ -123,6 +128,8 @@ exports.getUserByEmail = async (req, res, next) => {
             log(LOGTYPE.INFO, '', 'User not Found')
 
             // Creating new User
+            log(LOGTYPE.INFO, 'api process...', 'insert <User> data into <Users> table because user not founded')
+
             obj_user = await Users.create(
                 GenerateUsersObject({
                     PrimaryEmail:   req_email
@@ -140,6 +147,7 @@ exports.getUserByEmail = async (req, res, next) => {
         else
             log(LOGTYPE.INFO, 'User Found', obj_user["dataValues"])
         // Returning Communicator Name and Summary from the LookupCommunications table
+        log(LOGTYPE.INFO, 'api process...', 'find in <<LookupCommunicators>> table for getting <CommunicatorName> and <Summary>')
         const lookupCommunicators_for_summary_communicatorName = await LookupCommunicators.findOne({
             where: {
               CommunicatorId: obj_user["dataValues"]["CommunicatorId"]
@@ -197,6 +205,7 @@ exports.getContentById = async (req, res, next) => {
     try {
 
         // taken from PUT {id} and lookup User record for matching User.CompanyId --> UserContents.CompanyId
+        log(LOGTYPE.INFO, 'api process...', 'taken from PUT {id} and lookup <<User>> record for matching <User.CompanyId> --> <UserContents.CompanyId>')
         const user_find_companyId = await Users.findOne({
             where: {UserId: req_id}
         })
@@ -211,6 +220,7 @@ exports.getContentById = async (req, res, next) => {
             throw new Error("User not Found ")
         
         // RecipientEmail --> lookup User table
+        log(LOGTYPE.INFO, 'api process...', 'RecipientEmail --> lookup <<User>> table')
         const user_find_userId = await Users.findOne({
             where: {
                 [Op.or]: [{PrimaryEmail: req_content.recipientEmail}, {SecondaryEmail: req_content.recipientEmail}]
@@ -221,7 +231,7 @@ exports.getContentById = async (req, res, next) => {
             // if matching UserId is not found, then create a new User table entry and then save into database UserContents.RecipientId
 
             log(LOGTYPE.INFO, '', 'User not Found')
-
+            log(LOGTYPE.INFO, 'api process...', 'if matching <UserId> is not found, then create a new <<User>> table entry and then save into database <UserContents.RecipientId>')
             const obj_user = await await Users.create(
                 GenerateUsersObject({
                     PrimaryEmail:   req_content.recipientEmail
@@ -247,6 +257,7 @@ exports.getContentById = async (req, res, next) => {
             
   
         // creating new object in UserContents and responding 'Score' & 'UserContentID'
+        log(LOGTYPE.INFO, 'api process...', 'creating new object in <<UserContents>> and responding <Score> & <UserContentID>')
         const userContents_for_score_id = await UserContents.create(
             GenerateUserContentsObject(obj_userContents)
         );
